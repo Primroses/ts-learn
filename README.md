@@ -1,4 +1,4 @@
-# TypeScript
+# TypeScript 学习笔记
 > TypeScript是JavaScript的类型的超集,它可以编译成纯JavaScript。编译出来的JavaScript可以运行在任何浏览器上。
 TypeScript编译工具可以运行在任何服务器和任何系统上。  
 
@@ -101,11 +101,162 @@ HTMLCollection等
 - 在TypeScript的类型定义中, =>	用来表示函数的定义
 #### 接口中函数的定义
 也可以使用接口的方式来定义一个函数需要符合的形状
+``` javascript
+interface Search {
+  (source: string, subString: string): boolean;
+}
+let mySearch: Search;
+mySearch = function (source: string, subString: string) {
+  return source.search(subString) !== -1;
+}
+```
 #### 可选参数
-用 ？ 表示可选的参数
+用 ？ 表示可选的参数  
+**可选参数必须接在必需参数后面**
+``` TypeScript
+function example (name: string, age? number) {
+  // ...
+}
+```
 #### 参数默认值
-TypeScript	会将添加了默认值的参数识别为可选参数
+TypeScript会将添加了默认值的参数识别为可选参数
+``` TypeScript
+function example (name: string = 'leeper', age? number) {
+  // ...
+}
+```
+可选参数不用必须接在必需参数后面
 #### 剩余参数
 rest参数只能是最后一个参数
+``` TypeScript
+function example (array: any[], items: any[]) {
+  // ...
+}
+```
 #### 重载
 重载允许一个函数接受不同数量或类型的参数时,作出不同的处理
+
+### 类型断言
+类型断言可以用来绕过编译器的类型推断,手动指定一个值的类型  
+语法：
+```
+<类型>值
+
+// 或
+
+值 as 类型
+// 在TSX语法(React的JSX语法的TS版)中必须用后一种
+```
+
+### 声明文件
+当使用第三方库时,需要引用它的声明文件
+#### 声明语句
+使用第三方库，例如jQuery中的$，但是在TypeScrip中,并不知道$是什么，需要使用declare关键字来定义它的类型
+``` TypeScript
+declare var $: (string) => any;
+$('#foo');
+
+// declare定义的类型只会用于编译时的检查,编译结果中会被删除
+```
+#### 声明文件
+通常把类型声明放到一个单独的文件中
+```
+// jQuery.d.ts
+// 约定声明文件以.d.ts为后缀
+```
+引用文件
+```
+/// <reference path="./jQuery.d.ts" />
+
+// 在使用到的文件的开头,用「三斜线指令」表示引用了声明文件
+```
+#### 第三方声明文件
+推荐使用@types来管理
+```
+npm install @types/jquery --save-dev
+
+npm install @types/node --save-dev
+```
+
+### 内置对象
+JavaScript中的内置对象,包括DOM和BOM的内置对象，它们都可以直接在TypeScript	中当做定义好了的类型。
+``` TypeScript
+let b: Boolean = new Boolean(1);
+
+let body: HTMLElement = document.body;
+
+let div: NodeList = document.querySelectorAll('div');
+
+document.addEventListener('click', function (e: mouseEvent) {
+  // ...
+});
+```
+
+### 类型别名
+类型别名用来给一个类型起个新名字
+``` TypeScript
+type Name = string;
+type NameResolver = () => string;
+type NameOrResolver = Name | NameResolver;
+```
+
+### 字符串字面量类型
+字符串字面量类型用来约束取值只能是某几个字符串中的一个
+``` TypeScript
+type EventName = 'click' | 'mouseover';
+```
+
+### 元组
+数组合并了相同类型的对象,而元组合并了不同类型的对象
+``` TypeScript
+let person: [string, number] = ['leeper', 10]; 
+
+// 当赋值给越界的元素时,它类型会被限制为元组中每个类型的联合类型
+
+// 数组的第三项满足联合类型string|number
+person.push('male');
+```
+
+### 枚举
+枚举类型用于取值被限定在一定范围内的场景  
+比如一周只能有七天：
+``` TypeScript
+// 枚举成员会被赋值为从0开始递增的数字
+enum Days{Sun, Mon, Tue, Wed, Thu, Fri, Sat};
+
+// 也可以给枚举项手动赋值
+enum Days{Sun = 7, Mon = 1, Tue, Wed, Thu, Fri, Sat};
+```
+
+### 静态方法
+使用static修饰符修饰的方法称为静态方法,它们不需要实例化,而是直接通过类来调用
+
+### public private 和 protected
+- public修饰的属性或方法是公有的,可以在任何地方被访问到,默认所有的属性和方法都是public的
+- private修饰的属性或方法是私有的,不能在声明它的类的外部访问
+- protected修饰的属性或方法是受保护的,它和private类似,区别是它在子类中也是允许被访问的
+
+### 抽象类
+abstract用于定义抽象类和其中的抽象方法
+``` TypeScript
+abstract class Animal {
+  public name;
+  public constructor(name) {
+    this.name = name;
+  }
+  public abstract sayHi();
+}
+class Cat extends Animal {
+  public sayHi() {
+    console.log(`Meow, My name is ${this.name}`);
+  }
+}
+let cat = new Cat('Tom');
+```
+
+### 泛型
+泛型(Generics)是指在定义函数、接口或类的时候,不预先指定具体的类型,而
+在使用的时候再指定类型的一种特性
+
+### 声明合并
+如果定义了两个相同名字的函数、接口或类,那么它们会合并成一个类型
