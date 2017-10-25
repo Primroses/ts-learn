@@ -23,6 +23,7 @@ tsc hello.ts
 - null
 - undefined
 - Symbol  
+
 注意：在TypeScript中,boolean, number, string, Symbol是JavaScript中的基本类型,而Boolean, Number, String是JavaScript中的构造函数。
 ``` TypeScript
 // 编译通过
@@ -99,6 +100,7 @@ HTMLCollection等
 ### 函数
 在JavaScript中,有两种常见的定义函数的方式：函数声明和函数表达式
 - 在TypeScript的类型定义中, =>	用来表示函数的定义
+
 #### 接口中函数的定义
 也可以使用接口的方式来定义一个函数需要符合的形状
 ``` javascript
